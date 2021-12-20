@@ -5,19 +5,62 @@
  */
 package aplikasi_pulsa;
 
+import java.awt.HeadlessException;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import java.sql.SQLException;
 
 /**
  *
  * @author ASUS
  */
 public class form_utama extends javax.swing.JFrame {
+    
+        private void kosongkan_form(){
+           jTextField2.setText(null);
+           harga.setText(null);
+           nomer.setText(null);
+           provider.setSelectedItem(this);
+           jumlah_bayar.setText(null);
+           jumlah_kembalian.setText(null);
+           tanggal.setText(null);
+        }
+        
+        private void tampilkan_data(){
+            DefaultTableModel model = new DefaultTableModel();
+            model.addColumn("Tanggal");
+            model.addColumn("Nomer");
+            model.addColumn("Provider");
+            model.addColumn("Pulsa");
+            model.addColumn("Harga");
+            model.addColumn("Bayar");
+            
+            try{
+                String sql = "SELECT * FROM pulsa";
+                java.sql.Connection conn = (Connection)Konfig.configDB(); 
+                java.sql.Statement stm = conn.createStatement();
+                java.sql.ResultSet res = stm.executeQuery(sql);
+                
+                while(res.next()){
+                    model.addRow(new Object[]{res.getString(1),res.getString(2),res.getString(3),res.getString(4),res.getString(5),res.getString(6)});
+                }
+                tabelpulsa.setModel(model);
+                
+            }catch (SQLException e){
+                System.out.println("Error : " + e.getMessage());
+            }
+        }
+        
 
     /**
      * Creates new form form_utama
      */
     public form_utama() {
         initComponents();
+        tampilkan_data();
+        kosongkan_form();
     }
 
     /**
@@ -47,8 +90,12 @@ public class form_utama extends javax.swing.JFrame {
         jTextField2 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tabelpulsa = new javax.swing.JTable();
         jButton2 = new javax.swing.JButton();
+        tambah_data = new javax.swing.JButton();
+        simpan = new javax.swing.JButton();
+        jLabel8 = new javax.swing.JLabel();
+        tanggal = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -68,6 +115,11 @@ public class form_utama extends javax.swing.JFrame {
         jLabel5.setText("JUMLAH KEMBALIAN");
 
         jumlah_bayar.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        jumlah_bayar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jumlah_bayarActionPerformed(evt);
+            }
+        });
 
         jumlah_kembalian.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         jumlah_kembalian.addActionListener(new java.awt.event.ActionListener() {
@@ -124,7 +176,7 @@ public class form_utama extends javax.swing.JFrame {
             }
         });
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tabelpulsa.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -135,7 +187,7 @@ public class form_utama extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tabelpulsa);
 
         jButton2.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         jButton2.setText("KELUAR");
@@ -145,18 +197,31 @@ public class form_utama extends javax.swing.JFrame {
             }
         });
 
+        tambah_data.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        tambah_data.setText("TAMBAH DATA");
+        tambah_data.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tambah_dataActionPerformed(evt);
+            }
+        });
+
+        simpan.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        simpan.setText("SIMPAN");
+        simpan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                simpanActionPerformed(evt);
+            }
+        });
+
+        jLabel8.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        jLabel8.setText("TANGGAL");
+
+        tanggal.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(bayar)
-                .addGap(30, 30, 30)
-                .addComponent(batal)
-                .addGap(35, 35, 35)
-                .addComponent(jButton2)
-                .addGap(122, 122, 122))
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
@@ -183,14 +248,27 @@ public class form_utama extends javax.swing.JFrame {
                                     .addComponent(nomer)
                                     .addComponent(jTextField2))
                                 .addGap(18, 18, 18)
-                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(287, 287, 287)
-                        .addComponent(jLabel1))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel8))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(bayar)
+                            .addComponent(batal)
+                            .addComponent(jButton2)
+                            .addComponent(tanggal, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(42, 42, 42)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 788, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(48, Short.MAX_VALUE))
+                        .addComponent(tambah_data)
+                        .addGap(38, 38, 38)
+                        .addComponent(simpan))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(30, 30, 30)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 788, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(287, 287, 287)
+                        .addComponent(jLabel1)))
+                .addContainerGap(60, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -200,7 +278,9 @@ public class form_utama extends javax.swing.JFrame {
                 .addGap(37, 37, 37)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(provider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(provider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel8)
+                    .addComponent(tanggal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(28, 28, 28)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
@@ -217,20 +297,21 @@ public class form_utama extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(jumlah_bayar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(21, 21, 21)
+                    .addComponent(jumlah_bayar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(batal))
+                .addGap(19, 19, 19)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(jumlah_kembalian, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton2)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(bayar)
-                        .addComponent(batal)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
+                    .addComponent(jumlah_kembalian, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(bayar))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tambah_data)
+                    .addComponent(simpan)
+                    .addComponent(jButton2))
+                .addGap(37, 37, 37)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGap(18, 18, 18))
         );
 
         pack();
@@ -294,6 +375,32 @@ public class form_utama extends javax.swing.JFrame {
         System.exit (0);
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void tambah_dataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tambah_dataActionPerformed
+
+        kosongkan_form();
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tambah_dataActionPerformed
+
+    private void simpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_simpanActionPerformed
+
+        try{
+            String sql = "INSERT INTO pulsa VALUES ('"+tanggal.getText()+"','"+nomer.getText()+"','"+provider.getSelectedItem()+"','"+jTextField2.getText()+"','"+harga.getText()+"','"+jumlah_bayar.getText()+"')";
+            java.sql.Connection conn = (Connection)Konfig.configDB();
+            java.sql.PreparedStatement pstm = conn.prepareStatement(sql);
+            pstm.execute();
+            JOptionPane.showMessageDialog(null, "Proses Simpan Dta Berhasil..");
+            tampilkan_data();
+            kosongkan_form();
+        }catch(HeadlessException | SQLException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        }
+        // TODO add your handling code here:
+    }//GEN-LAST:event_simpanActionPerformed
+
+    private void jumlah_bayarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jumlah_bayarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jumlah_bayarActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -342,13 +449,17 @@ public class form_utama extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JOptionPane jOptionPane1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jumlah_bayar;
     private javax.swing.JTextField jumlah_kembalian;
     private javax.swing.JTextField nomer;
     private javax.swing.JComboBox<String> provider;
+    private javax.swing.JButton simpan;
+    private javax.swing.JTable tabelpulsa;
+    private javax.swing.JButton tambah_data;
+    private javax.swing.JTextField tanggal;
     // End of variables declaration//GEN-END:variables
 }
